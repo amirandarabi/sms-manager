@@ -1,0 +1,30 @@
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*kubeconfig*
+secrets/
+.claude/settings.local.json
+
+# Go
+/bin/
+/dist/
+*.test
+*.out
+coverage.*
+
+# Node
+node_modules/
+web/admin/dist/
+.pnpm-store/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Local data
+.data/
+tmp/
