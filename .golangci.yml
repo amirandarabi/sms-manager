@@ -1,0 +1,45 @@
+version: "2"
+
+# House style for the sms-manager Go module.
+# Scope: empty-module clean run for now (SMM-2). Later stories add real
+# packages; keep this file in sync with CLAUDE.md engineering rules
+# (gofmt, context first param, wrapped errors, no global state).
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - govet     # suspicious constructs (go vet)
+    - errcheck  # no silently-dropped errors
+    - staticcheck
+    - unused
+    - revive    # style, incl. context-as-argument (context.Context first param)
+  settings:
+    revive:
+      rules:
+        - name: context-as-argument
+          disabled: false
+        - name: error-return
+          disabled: false
+        - name: errorf
+          disabled: false
+  exclusions:
+    generated: lax
+    paths:
+      - gen/
+      - web/admin/
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    paths:
+      - gen/
+      - web/admin/
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
