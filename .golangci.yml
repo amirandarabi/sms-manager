@@ -1,8 +1,10 @@
 version: "2"
 
 # House style for the sms-manager Go module.
-# Scope: empty-module clean run for now (SMM-2). Later stories add real
-# packages; keep this file in sync with CLAUDE.md engineering rules
+# `golangci-lint run ./...` exits non-zero until the first real .go file
+# lands (no files to analyze) — `golangci-lint config verify` is the
+# correct check for an empty module. Later stories add real packages;
+# keep this file in sync with CLAUDE.md engineering rules
 # (gofmt, context first param, wrapped errors, no global state).
 
 run:
@@ -16,20 +18,11 @@ linters:
     - staticcheck
     - unused
     - revive    # style, incl. context-as-argument (context.Context first param)
-  settings:
-    revive:
-      rules:
-        - name: context-as-argument
-          disabled: false
-        - name: error-return
-          disabled: false
-        - name: errorf
-          disabled: false
   exclusions:
     generated: lax
     paths:
-      - gen/
-      - web/admin/
+      - ^gen/
+      - ^web/admin/
 
 formatters:
   enable:
@@ -37,8 +30,8 @@ formatters:
     - goimports
   exclusions:
     paths:
-      - gen/
-      - web/admin/
+      - ^gen/
+      - ^web/admin/
 
 issues:
   max-issues-per-linter: 0
