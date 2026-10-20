@@ -7,10 +7,10 @@ Read this file fully before doing anything. Detailed process lives in `docs/AGEN
 ```yaml
 GITHUB_REPO:        amirandarabi/sms-manager     # public
 DEFAULT_BRANCH:     main
-JIRA_SITE:          <your-site>.atlassian.net
+JIRA_SITE:          andarabiamirhosein.atlassian.net
 JIRA_PROJECT_KEY:   SMM                          # NOT "SMS": that prefix is reserved for our error codes (SMS-xxxx)
 JIRA_BOARD_URL:     https://<your-site>.atlassian.net/jira/software/projects/SMM/boards/<id>
-JIRA_CLOUD_ID:      <filled by first agent run via getAccessibleAtlassianResources>
+JIRA_CLOUD_ID:      606dd9e6-ff7f-4f73-b92b-8fda8e2864f0
 HUMAN_GATES:        [release, destructive, security-settings]   # see "Safety rules"
 ```
 
