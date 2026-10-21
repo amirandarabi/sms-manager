@@ -1,0 +1,55 @@
+# Default values for the gateway-api placeholder subchart.
+# Normally overridden via the umbrella chart's values.yaml `gateway-api:` block,
+# but valid standalone too (`helm lint`/`helm template` on this subchart alone).
+
+# global is normally injected by the umbrella chart (global: block in the
+# parent values.yaml); defaulted here so this subchart also lints/templates
+# standalone.
+global:
+  imagePullSecrets: []
+
+enabled: true
+
+replicaCount: 1
+
+image:
+  repository: nginxdemos/hello
+  tag: "plain-text"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+probes:
+  livenessPath: /
+  readinessPath: /
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+topologySpreadConstraints: []
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+podSecurityContext:
+  fsGroup: 10001
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "gateway-api",
+  "type": "object",
+  "required": ["image", "service", "resources"],
+  "properties": {
+    "enabled": { "type": "boolean" },
+    "replicaCount": { "type": "integer", "minimum": 0 },
+    "image": {
+      "type": "object",
+      "required": ["repository", "tag"],
+      "properties": {
+        "repository": { "type": "string" },
+        "tag": { "type": "string" },
+        "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "service": {
+      "type": "object",
+      "required": ["port"],
+      "properties": {
+        "type": { "type": "string" },
+        "port": { "type": "integer" }
+      }
+    },
+    "resources": { "type": "object" }
+  }
+}

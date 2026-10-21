@@ -1,0 +1,53 @@
+# Default values for the sms-manager umbrella chart.
+# Each key below namespaces the values for exactly one subchart in charts/<name>/.
+# See deploy/helm/README.md for how to add a new service's subchart + values block.
+
+global:
+  # Shared across all subcharts (image pull secrets, common labels, environment name).
+  imagePullSecrets: []
+  environment: dev
+
+# --- gateway-api: placeholder subchart proving the umbrella/subchart pattern. ---
+# Not a real service yet — see deploy/helm/sms-manager/charts/gateway-api/README.md.
+gateway-api:
+  enabled: true
+
+  replicaCount: 1
+
+  image:
+    repository: nginxdemos/hello
+    tag: "plain-text"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+  probes:
+    livenessPath: /
+    readinessPath: /
+
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+
+  topologySpreadConstraints: []
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: ["ALL"]
+
+  podSecurityContext:
+    fsGroup: 10001

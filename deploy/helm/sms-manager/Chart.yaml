@@ -1,0 +1,21 @@
+apiVersion: v2
+name: sms-manager
+description: Umbrella Helm chart for the SMS Manager platform — one subchart per deployable service (ARCHITECTURE.md §18.1, §14)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://github.com/amirandarabi/sms-manager
+sources:
+  - https://github.com/amirandarabi/sms-manager
+maintainers:
+  - name: SMS Manager platform team
+# Subcharts live under charts/<service>/. `helm lint` requires each one to be
+# declared here even though it's resolved locally (no `helm dependency update`
+# needed — the chart directory is used directly, not a packaged archive).
+# Each subchart's values are namespaced under its own top-level key in
+# values.yaml (e.g. `gateway-api:`).
+dependencies:
+  - name: gateway-api
+    version: 0.1.0
+    repository: "file://charts/gateway-api"
+    condition: gateway-api.enabled
