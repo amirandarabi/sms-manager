@@ -29,6 +29,23 @@ config — tracked on the [Jira board](https://andarabiamirhosein.atlassian.net/
 See `docs/ARCHITECTURE.md` §18.1 for the full repository layout and the rationale behind it.
 Each top-level directory has its own `README.md` explaining its purpose.
 
+## Tasks
+
+Local developer tasks are defined in [`Taskfile.yml`](Taskfile.yml) and run via
+[`task`](https://taskfile.dev) (`brew install go-task` or see the Taskfile.dev install docs).
+Run `task --list` to see this summary from the CLI.
+
+| Target | Status | What it does |
+|---|---|---|
+| `task dev` | **Stub** | Prints a "not yet implemented" message. Will start the local stack (Kafka, Postgres, Redis, Keycloak, Ollama, providersim, Grafana LGTM) via `docker-compose.dev.yml` once SMM-20/SMM-21 land. |
+| `task gen` | Live | Runs `buf generate` from `api/proto` (regenerates `gen/`) and `go generate ./...` (currently the `pkg/smserr` error-catalog doc generator; sqlc and mock generation wire in as those packages appear). |
+| `task lint` | Live | Runs `golangci-lint run ./...` and `buf lint` (from `api/proto`). |
+| `task test` | Live | Runs `go test ./... -race -cover`. |
+| `task build` | Live | Runs `go build ./...`. |
+
+Out of scope for now: `task e2e` (lands with the QA/e2e scaffolding story) and admin-panel
+(`pnpm`) targets (lands when `web/admin` gets real content in Phase 2a).
+
 ## Contributing
 
 No code without a Jira issue in `SMM`. Read `CLAUDE.md` and `docs/AGENT_WORKFLOW.md` before
