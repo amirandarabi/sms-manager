@@ -20,6 +20,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	otelmetric "go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -148,6 +149,16 @@ func Setup(ctx context.Context, cfg Config) (*Observability, error) {
 	}
 	o.MeterProvider = mp
 	otel.SetMeterProvider(mp)
+
+	// ARCHITECTURE.md §14.1 requires W3C traceparent propagation through
+	// Kafka headers (and HTTP/gRPC). The OTel SDK's global propagator
+	// defaults to a no-op, so without this, every Inject()/Extract() call
+	// anywhere in the process silently does nothing and trace context
+	// never crosses a service/Kafka boundary.
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+	))
 
 	w := cfg.LogWriter
 	if w == nil {

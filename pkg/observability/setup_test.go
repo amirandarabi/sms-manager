@@ -3,8 +3,13 @@ package observability
 import (
 	"bytes"
 	"context"
+	"strings"
 	"testing"
 	"time"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // TestSetup_NoOpFallbackWhenNoOTLPEndpoint covers AC1: a minimal harness
@@ -54,6 +59,40 @@ func TestSetup_NoOpFallbackWhenNoOTLPEndpoint(t *testing.T) {
 
 	if err := o.Shutdown(ctx); err != nil {
 		t.Fatalf("Shutdown() returned unexpected error: %v", err)
+	}
+}
+
+// TestSetup_RegistersW3CTraceContextPropagator covers ARCHITECTURE.md
+// §14.1 ("Trace context is propagated in Kafka headers (W3C
+// traceparent)"): Setup must register a real text-map propagator
+// globally, or Inject() silently produces an empty carrier and trace
+// context never crosses a service/Kafka boundary.
+func TestSetup_RegistersW3CTraceContextPropagator(t *testing.T) {
+	t.Setenv(EnvOTLPEndpoint, "")
+
+	o, err := Setup(context.Background(), Config{ServiceName: "propagator-test"})
+	if err != nil {
+		t.Fatalf("Setup() returned unexpected error: %v", err)
+	}
+	defer o.Shutdown(context.Background()) //nolint:errcheck // best-effort cleanup
+
+	prop := otel.GetTextMapPropagator()
+
+	sc := trace.NewSpanContext(trace.SpanContextConfig{
+		TraceID: [16]byte{0x4b, 0xf9, 0x2f, 0x35, 0x77, 0xb3, 0x4d, 0xa6, 0xa3, 0xce, 0x92, 0x9d, 0x0e, 0x0e, 0x47, 0x36},
+		SpanID:  [8]byte{0x00, 0xf0, 0x67, 0xaa, 0x0b, 0xa9, 0x02, 0xb7},
+	})
+	ctx := trace.ContextWithSpanContext(context.Background(), sc)
+
+	carrier := propagation.MapCarrier{}
+	prop.Inject(ctx, carrier)
+
+	got := carrier.Get("traceparent")
+	if got == "" {
+		t.Fatal("expected Setup() to register a propagator that injects a non-empty traceparent header; got empty carrier (still the default no-op propagator)")
+	}
+	if !strings.Contains(got, sc.TraceID().String()) {
+		t.Errorf("traceparent = %q, want it to contain trace id %s", got, sc.TraceID().String())
 	}
 }
 

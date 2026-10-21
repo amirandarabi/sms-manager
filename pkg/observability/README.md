@@ -62,6 +62,12 @@ initialized) and never panics:
 Call `obs.Shutdown(ctx)` on graceful shutdown (ARCHITECTURE.md §18.4) to
 flush pending spans/metrics and close exporters.
 
+`Setup` also registers a W3C `traceparent`/`baggage` text-map propagator
+globally (`otel.SetTextMapPropagator`), which ARCHITECTURE.md §14.1
+requires for propagating trace context through Kafka headers (and
+HTTP/gRPC). Without this, `propagation.Inject`/`Extract` calls anywhere
+in the process silently no-op against the OTel SDK default.
+
 ## Logging
 
 `obs.Logger` is a `*slog.Logger` that:
@@ -69,10 +75,17 @@ flush pending spans/metrics and close exporters.
 - Writes JSON to the configured writer (`os.Stdout` by default).
 - Always includes a fixed `service` field.
 - Automatically injects `trace_id`/`span_id` from the active OTel span in
-  the context passed to `*Context` logging methods (e.g. `InfoContext`).
-- Masks any Iranian MSISDN found in the message or in any string-valued
-  attribute, per ARCHITECTURE.md §10 (e.g. `0912***1234`) — see "PII
-  masking" below.
+  the context passed to `*Context` logging methods (e.g. `InfoContext`) —
+  always at the top level of the JSON object, even inside a
+  `logger.WithGroup(...)` scope, per ARCHITECTURE.md §18.3.
+- Masks any Iranian MSISDN found in the log message or in **any**
+  attribute value — strings, nested groups, and non-string values
+  (errors, structs, `fmt.Stringer`s) alike, since `logger.Error("...",
+  "err", err)` is the dominant Go idiom and a provider adapter's error
+  message is exactly where a recipient MSISDN is likely to leak. Non-string
+  values are rendered with `fmt.Sprintf("%v", ...)` and masked as a string
+  (so the attr's original Go type is not preserved in the JSON output —
+  intentional, see `maskAttr`'s doc comment). See "PII masking" below.
 
 Attach the remaining ARCHITECTURE.md §18.3 mandatory fields
 (`message_id`, `client_id`, `error_code`) with the `With*` helpers:

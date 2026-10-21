@@ -19,16 +19,18 @@ func MaskMSISDN(s string) string {
 	return msisdnPattern.ReplaceAllStringFunc(s, maskOneMSISDN)
 }
 
-// maskOneMSISDN masks a single matched MSISDN. The match is one of:
+// maskOneMSISDN masks a single matched MSISDN. msisdnPattern only matches
+// a leading "0", "+98", or "0098" immediately followed by 9 + 9 digits —
+// a bare "98" with no such prefix is never matched on its own. So the
+// match is one of:
 //
-//	0912xxxxxxx   (11 digits, local)
-//	989121234567  (98 + 10 digits, no leading 0/+/00)
-//	+989121234567
-//	00989121234567
+//	0912xxxxxxx     (11 digits, local)
+//	+989120001234
+//	00989120001234
 //
 // In every case the "national" part is the last 10 digits (9 + 9 digits),
 // which is normalized to the local 0-prefixed 11-digit form before masking
-// so output is always e.g. 0912***4567.
+// so output is always e.g. 0912***1234.
 func maskOneMSISDN(match string) string {
 	// Keep only the trailing 10 digits: "9" + the 9 subscriber digits.
 	national := match
