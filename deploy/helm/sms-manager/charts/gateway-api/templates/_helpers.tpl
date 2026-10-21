@@ -23,3 +23,15 @@ Selector labels (stable subset used for matchLabels/selectors).
 app.kubernetes.io/name: {{ .Chart.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
+{{/*
+ServiceAccount name to use — the generated one, or Values.serviceAccount.name
+if the caller wants to point at an existing/shared SA.
+*/}}
+{{- define "gateway-api.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+{{ default (include "gateway-api.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+{{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}

@@ -17,10 +17,11 @@
     },
     "service": {
       "type": "object",
-      "required": ["port"],
+      "required": ["port", "targetPort"],
       "properties": {
         "type": { "type": "string" },
-        "port": { "type": "integer" }
+        "port": { "type": "integer" },
+        "targetPort": { "type": "integer" }
       }
     },
     "resources": { "type": "object" }

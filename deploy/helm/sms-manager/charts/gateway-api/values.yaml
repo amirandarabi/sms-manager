@@ -13,13 +13,19 @@ enabled: true
 replicaCount: 1
 
 image:
-  repository: nginxdemos/hello
-  tag: "plain-text"
+  # nginxinc/nginx-unprivileged is built to run as a non-root user (uid 101)
+  # and listen on a port >1024 — unlike nginxdemos/hello (root-owned
+  # /var/cache/nginx, binds 80), it actually starts under this chart's
+  # hardened securityContext. See deploy/helm/README.md for why this matters
+  # for every Phase 1 service copying this pattern.
+  repository: nginxinc/nginx-unprivileged
+  tag: "1.27-alpine"
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
-  port: 80
+  port: 80          # what the Service exposes
+  targetPort: 8080  # what the container actually listens on (image default)
 
 resources:
   requests:
@@ -32,6 +38,14 @@ resources:
 probes:
   livenessPath: /
   readinessPath: /
+  # Timing knobs plumbed through now so real Phase 1 services inherit them.
+  # Per ARCHITECTURE §18.3, liveness must stay cheap/local (no DB/Kafka/Redis
+  # checks) while readiness may check dependencies — hence the separate
+  # /livez vs /readyz paths real services should set.
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
 
 podDisruptionBudget:
   enabled: false
@@ -41,14 +55,27 @@ topologySpreadConstraints: []
 
 securityContext:
   runAsNonRoot: true
-  runAsUser: 10001
+  runAsUser: 101  # nginxinc/nginx-unprivileged's own built-in uid
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   capabilities:
     drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault
 
 podSecurityContext:
-  fsGroup: 10001
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+serviceAccount:
+  # No real API-server access is needed by this placeholder (or most
+  # services) — explicit `false` instead of leaving the default SA's token
+  # auto-mounted into every pod.
+  create: true
+  automountServiceAccountToken: false
+  annotations: {}
+  name: ""
 
 nodeSelector: {}
 tolerations: []

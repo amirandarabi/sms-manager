@@ -8,20 +8,24 @@ global:
   environment: dev
 
 # --- gateway-api: placeholder subchart proving the umbrella/subchart pattern. ---
-# Not a real service yet — see deploy/helm/sms-manager/charts/gateway-api/README.md.
+# Not a real service yet — see deploy/helm/README.md.
 gateway-api:
   enabled: true
 
   replicaCount: 1
 
   image:
-    repository: nginxdemos/hello
-    tag: "plain-text"
+    # nginxinc/nginx-unprivileged: runs as uid 101, listens on 8080 — starts
+    # cleanly under the hardened securityContext below (unlike
+    # nginxdemos/hello, which needs root). See deploy/helm/README.md.
+    repository: nginxinc/nginx-unprivileged
+    tag: "1.27-alpine"
     pullPolicy: IfNotPresent
 
   service:
     type: ClusterIP
-    port: 80
+    port: 80          # what the Service exposes
+    targetPort: 8080  # what the container actually listens on (image default)
 
   resources:
     requests:
@@ -34,6 +38,10 @@ gateway-api:
   probes:
     livenessPath: /
     readinessPath: /
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
 
   podDisruptionBudget:
     enabled: false
@@ -43,11 +51,21 @@ gateway-api:
 
   securityContext:
     runAsNonRoot: true
-    runAsUser: 10001
+    runAsUser: 101  # nginxinc/nginx-unprivileged's own built-in uid
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
     capabilities:
       drop: ["ALL"]
+    seccompProfile:
+      type: RuntimeDefault
 
   podSecurityContext:
-    fsGroup: 10001
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+
+  serviceAccount:
+    create: true
+    automountServiceAccountToken: false
+    annotations: {}
+    name: ""
