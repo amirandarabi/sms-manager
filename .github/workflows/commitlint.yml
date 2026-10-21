@@ -1,7 +1,16 @@
 name: commitlint
 
-# Enforces Conventional Commits (ARCHITECTURE.md §18.2) on every PR commit.
-# Scopes are checked via commitlint.config.js. No deploy/release side effects.
+# Enforces Conventional Commits (ARCHITECTURE.md §18.2) on the PR title.
+#
+# Per docs/AGENT_WORKFLOW.md §6, PRs are squash-merged, and the PR TITLE
+# becomes the commit message that actually lands on `main` and gets parsed
+# by release-please. Individual commits on the branch never reach `main`,
+# so this lints the title (not the commit range) — a malformed title would
+# otherwise pass silently here and land unparseable on main (no version
+# bump, no changelog entry).
+#
+# The title is passed via `env:` (not inlined into the `run:` script) so an
+# attacker-controlled PR title can't be interpreted as shell syntax.
 
 on:
   pull_request:
@@ -16,13 +25,11 @@ concurrency:
 
 jobs:
   commitlint:
-    name: lint commit messages
+    name: lint PR title
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
@@ -32,9 +39,7 @@ jobs:
       - name: Install commitlint
         run: npm install --no-save @commitlint/cli@19 @commitlint/config-conventional@19
 
-      - name: Lint all commits in this PR
-        run: |
-          npx commitlint \
-            --from "${{ github.event.pull_request.base.sha }}" \
-            --to "${{ github.event.pull_request.head.sha }}" \
-            --verbose
+      - name: Lint PR title as the future squash-commit message
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$PR_TITLE" | npx commitlint --verbose

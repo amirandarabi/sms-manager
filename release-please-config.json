@@ -27,13 +27,13 @@
       "package-name": "sms-manager",
       "changelog-path": "CHANGELOG.md",
       "tag-separator": "-",
-      "include-component-in-tag": true
+      "include-component-in-tag": false
     },
     "api": {
       "release-type": "simple",
       "component": "api",
       "package-name": "sms-manager-api",
-      "changelog-path": "api/CHANGELOG.md",
+      "changelog-path": "CHANGELOG.md",
       "tag-separator": "/",
       "include-component-in-tag": true
     }
