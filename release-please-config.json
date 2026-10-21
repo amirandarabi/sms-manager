@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "draft": false,
+  "prerelease": false,
+  "pull-request-title-pattern": "chore(release): ${component} ${version}",
+  "group-pull-request-title-pattern": "chore(release): release ${version}",
+  "separate-pull-requests": true,
+  "changelog-sections": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "perf", "section": "Performance Improvements" },
+    { "type": "revert", "section": "Reverts" },
+    { "type": "docs", "section": "Documentation", "hidden": false },
+    { "type": "build", "section": "Build System", "hidden": false },
+    { "type": "chore", "section": "Miscellaneous Chores", "hidden": true },
+    { "type": "refactor", "section": "Code Refactoring", "hidden": true },
+    { "type": "test", "section": "Tests", "hidden": true },
+    { "type": "ci", "section": "Continuous Integration", "hidden": true },
+    { "type": "style", "section": "Styles", "hidden": true }
+  ],
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "component": "sms-manager",
+      "package-name": "sms-manager",
+      "changelog-path": "CHANGELOG.md",
+      "tag-separator": "-",
+      "include-component-in-tag": false
+    },
+    "api": {
+      "release-type": "simple",
+      "component": "api",
+      "package-name": "sms-manager-api",
+      "changelog-path": "CHANGELOG.md",
+      "tag-separator": "/",
+      "include-component-in-tag": true
+    }
+  }
+}

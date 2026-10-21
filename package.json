@@ -1,0 +1,16 @@
+{
+  "name": "sms-manager",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Repo-root tooling for sms-manager: Conventional Commits linting (commitlint) and release automation (release-please). Go module and web/admin app are versioned independently; see go.mod and web/admin/package.json.",
+  "scripts": {
+    "commitlint": "commitlint --from HEAD~1 --to HEAD --verbose"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

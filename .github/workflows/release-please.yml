@@ -1,0 +1,45 @@
+name: release-please
+
+# release-please in monorepo mode (ARCHITECTURE.md §18.2, CLAUDE.md release
+# human-gate). On every push to `main`, release-please opens or updates one
+# "chore(release): ..." pull request per configured component
+# (release-please-config.json) with the generated per-component CHANGELOG
+# bump. It does NOT create a GitHub Release or a git tag by itself.
+#
+# HUMAN GATE: a release is only cut when a human reviews and merges that
+# release PR. Merging the release PR is what makes release-please (running
+# again on that merge push) create the GitHub Release + tag. No tag or
+# release is published as a side effect of this workflow on ordinary commits
+# to main — see CLAUDE.md "Human confirmation required before ... creating
+# releases or tags".
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write # release-please commits release PRs / tags once a human merges one
+  pull-requests: write # release-please opens/updates release PRs
+
+concurrency:
+  group: release-please-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: open/update release PRs
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned by SHA (googleapis/release-please-action v4.2.0).
+      - uses: googleapis/release-please-action@a02a34c4d625f9be7cb89156071d8567266a2445 # v4.2.0
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          target-branch: main
+
+      # NOTE: steps.release.outputs.<component>--release_created only turns
+      # true on the commit where a human merged the release PR, i.e. this
+      # job never auto-publishes on an ordinary feature/fix commit. Any
+      # follow-up publish step (container push, SDK publish, etc.) must be
+      # gated on that output and added in a later story, not here.
