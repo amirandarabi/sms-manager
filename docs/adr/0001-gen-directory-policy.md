@@ -2,11 +2,8 @@
 
 **Status:** Accepted
 **Date:** 2026-10-21
-**Related:** SMM-3 (Buf scaffold), SMM-2 (`gen/` placeholder), SMM-7 (`task gen`), SMM-8 (CI pipeline)
-
-> Note: SMM-16 will land the formal ADR template; this record uses a simple
-> Context/Decision/Consequences format in the meantime, as instructed by
-> SMM-3's acceptance criteria.
+**Deciders:** principal-engineer
+**Related:** SMM-3 (Buf scaffold), SMM-2 (`gen/` placeholder), SMM-7 (`task gen`), SMM-8 (CI pipeline), SMM-16 (reformatted to [ADR 0000](./0000-adr-template.md))
 
 ## Context
 
@@ -72,3 +69,13 @@ Options considered:
 - If generated code size/diff noise becomes a real problem later (e.g. once
   the full §15 contract and sqlc queries land), this decision can be
   revisited in a follow-up ADR — it is not a one-way door.
+
+---
+
+**Numbering note (SMM-16).** This ADR was written by SMM-3 before the ADR
+template existed, so it took number 0001. SMM-16 kept the number and filename
+unchanged — merged work (SMM-2, SMM-3, SMM-7, SMM-8) already references this
+path — and only reformatted the header to match
+[ADR 0000](./0000-adr-template.md). The Context, Decision and Consequences are
+unchanged. The backfilled §14 stack ADRs therefore start at 0002, and no
+separate `gen/`-policy ADR was created.

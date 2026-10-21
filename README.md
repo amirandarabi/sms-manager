@@ -13,6 +13,8 @@ This repo is built by a team of Claude agents coordinated through a public Jira 
 - [`docs/AGENT_WORKFLOW.md`](docs/AGENT_WORKFLOW.md) — how the agent team plans, tracks, builds,
   reviews and ships work: Jira lifecycle, GitHub conventions, comment templates, and the
   orchestration loop.
+- [`docs/adr/README.md`](docs/adr/README.md) — the Architecture Decision Record index: why the
+  stack in ARCHITECTURE.md §14 is what it is, plus the template every new ADR follows.
 - [`CLAUDE.md`](CLAUDE.md) — project config, tech stack, agent roster, golden workflow, and
   safety rules.
 
