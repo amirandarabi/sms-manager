@@ -1,8 +1,13 @@
+# Plugin versions are pinned via the `tool` directives in the repo's
+# go.mod (google.golang.org/protobuf, connectrpc.com/connect), so codegen
+# output is reproducible across machines/CI and stays in lockstep with the
+# runtime library versions `gen/` is compiled against. Run `go mod tidy`
+# after bumping either dependency to keep the pinned tool versions in sync.
 version: v2
 plugins:
-  - local: protoc-gen-go
+  - local: ["go", "tool", "protoc-gen-go"]
     out: ../../gen
     opt: paths=source_relative
-  - local: protoc-gen-connect-go
+  - local: ["go", "tool", "protoc-gen-connect-go"]
     out: ../../gen
     opt: paths=source_relative

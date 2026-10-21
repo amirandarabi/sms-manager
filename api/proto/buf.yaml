@@ -5,5 +5,9 @@ lint:
   use:
     - STANDARD
 breaking:
+  # FILE is the strictest breaking-change category: it also flags moving a
+  # message/service to a different file or package. Keep it strict by
+  # default — loosen only with an ADR, since that's the signal a future
+  # contributor needs before relaxing this.
   use:
     - FILE

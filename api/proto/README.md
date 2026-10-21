@@ -22,14 +22,16 @@ below manually before opening a PR that touches `api/proto/**`.
 
 ### Commands
 
-Run from `api/proto/` (or pass `--path api/proto` from the repo root):
+Run from `api/proto/`. Note `.git` lives at the repo root, two levels up
+from here, so the breaking-change reference needs `../../.git` plus
+`subdir=api/proto` to point back at this module within that checkout:
 
 ```bash
 # 1. Lint the contracts — must pass with zero warnings.
 buf lint
 
 # 2. Check for breaking changes against the main branch baseline.
-buf breaking --against '.git#branch=main'
+buf breaking --against '../../.git#branch=main,subdir=api/proto'
 ```
 
 Then regenerate the Go stubs:

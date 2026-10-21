@@ -1,14 +1,16 @@
-// Placeholder contract proving the Buf lint/breaking/generate pipeline
-// (SMM-3). The real MessageService/OtpService/ContentService contracts
-// land in Phase 1a/1b per ARCHITECTURE.md §15.
 syntax = "proto3";
 
 package sms.v1;
 
 option go_package = "github.com/amirandarabi/sms-manager/gen/sms/v1;smsv1";
 
-// HealthService lets any transport (REST/gRPC/Connect) check service
-// liveness using the same generated contract.
+// HealthService is a placeholder contract proving the Buf
+// lint/breaking/generate pipeline (SMM-3). The real
+// MessageService/OtpService/ContentService contracts land in Phase 1a/1b
+// per ARCHITECTURE.md §15.
+//
+// It lets any transport (REST/gRPC/Connect) check service liveness using
+// the same generated contract.
 service HealthService {
   rpc Check(CheckRequest) returns (CheckResponse);
 }
