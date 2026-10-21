@@ -1,0 +1,65 @@
+version: "3"
+
+# Local developer tasks for sms-manager. See CLAUDE.md "Useful commands" and
+# ARCHITECTURE.md §18.6. `task <name>` runs these; `task --list` summarizes
+# them. Requires https://taskfile.dev.
+#
+# Status of each target (Phase 0):
+#   dev   - STUB. Real implementation lands with SMM-20/SMM-21 (dev-stack
+#           compose files for Kafka/Postgres/Redis/Keycloak/Ollama).
+#   gen   - buf generate is live (api/proto, SMM-3). go generate ./... is
+#           live (pkg/smserr/internal/gencatalog, SMM-6). sqlc/mocks wire
+#           in as those packages appear in later phases.
+#   lint  - live: golangci-lint + buf lint.
+#   test  - live: go test ./... -race -cover.
+#   build - live: go build ./....
+
+tasks:
+  dev:
+    desc: Start the local dev stack (Kafka, Postgres, Redis, Keycloak, Ollama, providersim, Grafana LGTM).
+    cmds:
+      - 'echo "task dev: not yet implemented — lands with SMM-20/SMM-21 (docker-compose.dev.yml). See ARCHITECTURE.md §18.6."'
+
+  gen:
+    desc: Regenerate code from contracts (buf generate) and run go:generate directives (sqlc/mocks land in later phases).
+    cmds:
+      - task: gen:proto
+      - task: gen:go
+
+  gen:proto:
+    internal: true
+    dir: api/proto
+    cmds:
+      - buf generate
+
+  gen:go:
+    internal: true
+    cmds:
+      - go generate ./...
+
+  lint:
+    desc: Run all linters (golangci-lint on the Go module, buf lint on api/proto).
+    cmds:
+      - task: lint:go
+      - task: lint:proto
+
+  lint:go:
+    internal: true
+    cmds:
+      - golangci-lint run ./...
+
+  lint:proto:
+    internal: true
+    dir: api/proto
+    cmds:
+      - buf lint
+
+  test:
+    desc: Run the Go test suite with race detection and coverage.
+    cmds:
+      - go test ./... -race -cover
+
+  build:
+    desc: Build all Go packages and binaries.
+    cmds:
+      - go build ./...
