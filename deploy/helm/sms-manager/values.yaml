@@ -1,0 +1,71 @@
+# Default values for the sms-manager umbrella chart.
+# Each key below namespaces the values for exactly one subchart in charts/<name>/.
+# See deploy/helm/README.md for how to add a new service's subchart + values block.
+
+global:
+  # Shared across all subcharts (image pull secrets, common labels, environment name).
+  imagePullSecrets: []
+  environment: dev
+
+# --- gateway-api: placeholder subchart proving the umbrella/subchart pattern. ---
+# Not a real service yet — see deploy/helm/README.md.
+gateway-api:
+  enabled: true
+
+  replicaCount: 1
+
+  image:
+    # nginxinc/nginx-unprivileged: runs as uid 101, listens on 8080 — starts
+    # cleanly under the hardened securityContext below (unlike
+    # nginxdemos/hello, which needs root). See deploy/helm/README.md.
+    repository: nginxinc/nginx-unprivileged
+    tag: "1.27-alpine"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80          # what the Service exposes
+    targetPort: 8080  # what the container actually listens on (image default)
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+  probes:
+    livenessPath: /
+    readinessPath: /
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+
+  topologySpreadConstraints: []
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101  # nginxinc/nginx-unprivileged's own built-in uid
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: RuntimeDefault
+
+  podSecurityContext:
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+
+  serviceAccount:
+    create: true
+    automountServiceAccountToken: false
+    annotations: {}
+    name: ""

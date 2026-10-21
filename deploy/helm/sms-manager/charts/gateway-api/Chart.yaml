@@ -1,0 +1,9 @@
+apiVersion: v2
+name: gateway-api
+description: >-
+  Placeholder subchart proving the umbrella-chart pattern (SMM-22). Renders a
+  "hello world" public image behind a Deployment/Service; replace with the
+  real gateway-api service manifests/image in Phase 1.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

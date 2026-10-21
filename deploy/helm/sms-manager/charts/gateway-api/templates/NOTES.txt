@@ -1,0 +1,5 @@
+gateway-api (placeholder) deployed as {{ include "gateway-api.fullname" . }}.
+
+This is a pattern-proof subchart only (SMM-22) — it serves a public "hello
+world" image, not the real gateway-api service. See deploy/helm/README.md for
+how to replace it with a real service in Phase 1.

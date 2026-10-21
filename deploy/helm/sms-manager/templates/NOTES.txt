@@ -1,0 +1,6 @@
+sms-manager umbrella chart deployed (release {{ .Release.Name }} in namespace {{ .Release.Namespace }}).
+
+Enabled subcharts:
+{{- if index .Values "gateway-api" "enabled" }}
+  - gateway-api (placeholder, SMM-22 — see deploy/helm/README.md to add real services)
+{{- end }}
